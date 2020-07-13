@@ -65,13 +65,6 @@ class MainWindow : public Gtk::Window {
         bool _SUPPORTS_ALPHA = false;
 };
 
-struct DesktopEntry {
-    std::string name;
-    std::string exec;
-    std::string icon;
-    std::string comment;
-};
-
 struct CacheEntry {
     std::string exec;
     int clicks;
@@ -84,9 +77,6 @@ std::string get_cache_path(void);
 std::string get_pinned_path(void);
 void add_and_save_pinned(std::string);
 void remove_and_save_pinned(std::string);
-std::vector<std::string> get_app_dirs(void);
-std::vector<std::string> list_entries(std::vector<std::string>);
-std::vector<std::string> desktop_entry(std::string, std::string);
 ns::json get_cache(std::string);
  std::vector<std::string> get_pinned(std::string);
 std::vector<CacheEntry> get_favourites(ns::json, int);

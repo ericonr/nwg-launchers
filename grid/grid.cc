@@ -10,8 +10,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include <fstream>
+
 #include "nwg_tools.h"
 #include "nwg_classes.h"
+#include "nwg_desktop.h"
 #include "on_event.h"
 #include "grid.h"
 
@@ -160,7 +163,7 @@ int main(int argc, char *argv[]) {
         } else {
           std::cout << "No pinned entries found\n";
         }
-	  }
+    }
 
     std::string config_dir = get_config_dir("nwggrid");
     if (!fs::is_directory(config_dir)) {
@@ -201,39 +204,7 @@ int main(int argc, char *argv[]) {
     }
     std::cout << "Locale: " << lang << "\n";
 
-    /* get all applications dirs */
-    std::vector<std::string> app_dirs = get_app_dirs();
-
-    /* get a list of paths to all *.desktop entries */
-    std::vector<std::string> entries = list_entries(app_dirs);
-    std::cout << entries.size() << " .desktop entries found\n";
-
-    /* create the vector of DesktopEntry structs */
-    std::vector<DesktopEntry> desktop_entries {};
-    for (std::string entry : entries) {
-        // string path -> vector<string> {name, exec, icon, comment}
-        std::vector<std::string> e = desktop_entry(entry, lang);
-        struct DesktopEntry de = {e[0], e[1], e[2], e[3]};
-
-        // only add if 'name' and 'exec' not empty
-        if (!e[0].empty() && !e[1].empty()) {
-            // avoid adding duplicates
-            bool found = false;
-            for (DesktopEntry entry : desktop_entries) {
-                if (entry.name == de.name && entry.exec == de.exec) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                desktop_entries.push_back(de);
-            }
-        }
-    }
-
-    /* sort above by the 'name' field */
-    sort(desktop_entries.begin(), desktop_entries.end(), [](const DesktopEntry& lhs, const DesktopEntry& rhs) {
-        return lhs.name < rhs.name;
-    });
+    auto desktop_entries = create_desktop_entries(lang);
 
     /* turn off borders, enable floating on sway */
     if (wm == "sway") {
@@ -297,16 +268,16 @@ int main(int argc, char *argv[]) {
     /* Create buttons for all desktop entries */
     for(auto it = desktop_entries.begin(); it != desktop_entries.end(); it++) {
         if (std::find(pinned.begin(), pinned.end(), it -> exec) == pinned.end()) {
-			Gtk::Image* image = app_image(it -> icon);
-			AppBox *ab = new AppBox(it -> name, it -> exec, it -> comment);
-			ab -> set_image_position(Gtk::POS_TOP);
-			ab -> set_image(*image);
-			ab -> signal_clicked().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_button_clicked), it -> exec));
-			ab -> signal_enter_notify_event().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_button_entered), it -> comment));
-			ab -> signal_focus_in_event().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_button_focused), it -> comment));
-			ab -> signal_button_press_event().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_grid_button_press), it -> exec));
-			window.all_boxes.push_back(ab);
-		}
+            Gtk::Image* image = app_image(it -> icon);
+            AppBox *ab = new AppBox(it -> name, it -> exec, it -> comment);
+            ab -> set_image_position(Gtk::POS_TOP);
+            ab -> set_image(*image);
+            ab -> signal_clicked().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_button_clicked), it -> exec));
+            ab -> signal_enter_notify_event().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_button_entered), it -> comment));
+            ab -> signal_focus_in_event().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_button_focused), it -> comment));
+            ab -> signal_button_press_event().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_grid_button_press), it -> exec));
+            window.all_boxes.push_back(ab);
+        }
     }
     window.label_desc.set_text(std::to_string(window.all_boxes.size()));
 
