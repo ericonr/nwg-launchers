@@ -12,6 +12,7 @@
 
 #include "nwg_tools.h"
 #include "nwg_classes.h"
+#include "nwg_desktop.h"
 #include "on_event.h"
 #include "dmenu.h"
 
@@ -80,11 +81,9 @@ int main(int argc, char *argv[]) {
     }
 
     // We will build dmenu out of commands found in $PATH if nothing has been passed by stdin
-    dmenu_run = isatty(fileno(stdin)) == 1;
+    dmenu_run = isatty(fileno(stdin)) == 1 || input.cmdOptionExists("-run");
 
-    if (input.cmdOptionExists("-run")){
-        dmenu_run = true;
-    }
+    const bool rofi = input.cmdOptionExists("-rofi");
 
     // Otherwise let's build from stdin input
     if (!dmenu_run) {
@@ -297,7 +296,7 @@ int main(int argc, char *argv[]) {
     for (Glib::ustring command : all_commands) {
         Gtk::MenuItem *item = new Gtk::MenuItem();
         item -> set_label(command);
-        item -> signal_activate().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_item_clicked), command));
+        item -> signal_activate().connect(sigc::bind<std::string>(sigc::ptr_fun(&on_item_clicked), "zathura"));
         menu.append(*item);
         cnt++;
         if (cnt > rows - 1) {
