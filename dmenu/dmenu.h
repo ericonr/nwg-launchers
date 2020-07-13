@@ -13,19 +13,14 @@
 
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 #include <regex>
 #include <algorithm>
 
 #include <gtkmm.h>
 #include <glibmm/ustring.h>
 
-#include <nlohmann/json.hpp>
-
+#include "nwg_namespaces.h"
 #include "nwgconfig.h"
-
-namespace fs = std::filesystem;
-namespace ns = nlohmann;
 
 extern std::string h_align;
 extern std::string v_align;

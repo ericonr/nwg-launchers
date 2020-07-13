@@ -13,18 +13,13 @@
 
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 
 #include <gtkmm.h>
 #include <glibmm/ustring.h>
 
-#include <nlohmann/json.hpp>    // nlohmann-json package
-
+#include "nwg_namespaces.h"
 #include "nwg_classes.h"
 #include "nwgconfig.h"
-
-namespace fs = std::filesystem;
-namespace ns = nlohmann;
 
 extern int image_size;
 extern double opacity;
@@ -52,13 +47,6 @@ class MainWindow : public Gtk::Window {
         virtual bool on_draw(const ::Cairo::RefPtr< ::Cairo::Context>& cr);
         void on_screen_changed(const Glib::RefPtr<Gdk::Screen>& previous_screen);
         bool _SUPPORTS_ALPHA = false;
-};
-
-struct DesktopEntry {
-    std::string name;
-    std::string exec;
-    std::string icon;
-    std::string comment;
 };
 
 struct BarEntry {

@@ -13,18 +13,13 @@
 
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 
 #include <gtkmm.h>
 #include <glibmm/ustring.h>
 
-#include <nlohmann/json.hpp>
-
+#include "nwg_namespaces.h"
 #include "nwg_classes.h"
 #include "nwgconfig.h"
-
-namespace fs = std::filesystem;
-namespace ns = nlohmann;
 
 extern bool pins;
 extern double opacity;
